@@ -8,6 +8,7 @@ Thin wrapper that delegates build tasks to PowerShell scripts:
   - scripts/graal/build-bridge.ps1 → Java KTX Bridge JAR
   - scripts/graal/build-jre.ps1  → GraalVM jlink JRE assembly
   - scripts/graal/package.ps1    → Archive + checksum
+  - scripts/graal/deploy-to-prism.ps1 → Deploy to PrismLauncher
 
 Usage:
     python jmine.py build              # Build all components
@@ -15,6 +16,7 @@ Usage:
     python jmine.py build ktx          # Build only KTX
     python jmine.py build bridge       # Build only KTX bridge
     python jmine.py build jre          # Assemble JRE from built components
+    python jmine.py deploy             # Deploy JRE to PrismLauncher
     python jmine.py clean              # Clean all build artifacts
     python jmine.py package            # Package JRE for distribution
     python jmine.py --help             # Show help
@@ -109,6 +111,15 @@ def package_jre() -> bool:
     return rc == 0
 
 
+def deploy_to_prism() -> bool:
+    ps1 = SCRIPT_DIR / "graal" / "deploy-to-prism.ps1"
+    if not ps1.exists():
+        print(f"[ERROR] {ps1} not found")
+        return False
+    rc = run_pwsh(ps1)
+    return rc == 0
+
+
 # ── Clean ──────────────────────────────────────────────────────────────
 
 def clean() -> None:
@@ -144,6 +155,7 @@ PowerShell scripts:
   scripts/graal/build-bridge.ps1   Compile Java KTX Bridge JAR
   scripts/graal/build-jre.ps1      Assemble JMine JRE with jlink
   scripts/graal/package.ps1        Package JRE archive + checksum
+  scripts/graal/deploy-to-prism.ps1 Deploy JRE to PrismLauncher
 
 Examples:
   python jmine.py build              Build all components
@@ -151,6 +163,7 @@ Examples:
   python jmine.py build ktx          Build only KTX
   python jmine.py build bridge       Build only KTX bridge
   python jmine.py build jre          Assemble JRE from built components
+  python jmine.py deploy             Deploy JRE to PrismLauncher
   python jmine.py clean              Clean all build artifacts
   python jmine.py package            Package JRE for distribution
         """,
@@ -158,8 +171,8 @@ Examples:
 
     parser.add_argument(
         "command",
-        choices=["build", "clean", "package"],
-        help="Build command: build, clean, or package",
+        choices=["build", "clean", "package", "deploy"],
+        help="Build command: build, clean, package, or deploy",
     )
     parser.add_argument(
         "component",
@@ -177,6 +190,10 @@ Examples:
 
     if args.command == "package":
         success = package_jre()
+        sys.exit(0 if success else 1)
+
+    if args.command == "deploy":
+        success = deploy_to_prism()
         sys.exit(0 if success else 1)
 
     # ── Build ──────────────────────────────────────────────────────

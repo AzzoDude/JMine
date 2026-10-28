@@ -35,7 +35,7 @@ Khronos Group's texture compression library with Java bindings. Enables runtime 
 - **macOS**: `libktx.dylib` + JNI JAR
 
 ### 3. Java KTX Bridge
-A Java instrumentation bridge (`jmine-ktx-bridge.jar`) that intercepts texture loading at runtime, converting PNG textures to BC7-compressed KTX format before GPU upload. Includes performance transformers for thread pool optimization and allocation reduction.
+A Java instrumentation agent (`jmine-ktx-bridge.jar`) with **ASM 9.7.1 embedded** that intercepts Minecraft's texture loading at the bytecode level. It transforms `Resource.open()` at class load time to check the DDS cache before every texture load, serving cached compressed textures automatically. Includes performance transformers for thread pool optimization and allocation reduction. No mods required — fully plug-and-play.
 
 ## Platform Support
 
@@ -167,7 +167,7 @@ JMine/
 │   ├── ktx/
 │   │   └── build.ps1          # Build KTX library with JNI
 │   └── graal/
-│       ├── build-bridge.ps1   # Compile Java KTX Bridge JAR
+│       ├── build-bridge.ps1   # Compile Java KTX Bridge JAR (downloads ASM, creates fat JAR)
 │       ├── build-jre.ps1      # Assemble JMine JRE with jlink
 │       └── package.ps1        # Package JRE archive + checksum
 ├── jmine-ktx-bridge/          # Java KTX bridge source

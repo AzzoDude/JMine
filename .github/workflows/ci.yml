@@ -130,7 +130,7 @@ jobs:
           path: artifacts/ktx/${{ matrix.platform }}-${{ matrix.arch }}/
 
   ##############################################################################
-  # Build Java KTX bridge JAR
+  # Build Java KTX bridge JAR (with ASM embedded)
   ##############################################################################
   build-ktx-bridge:
     runs-on: ubuntu-24.04
@@ -146,17 +146,20 @@ jobs:
           distribution: temurin
           java-version: ${{ env.JAVA_VERSION }}
 
-      - name: Build KTX bridge
+      - name: Build KTX bridge (downloads ASM automatically)
         shell: pwsh
         run: |
           pwsh -File jmine/scripts/graal/build-bridge.ps1 `
             -Source "${{ github.workspace }}/jmine/jmine-ktx-bridge" `
             -Output "${{ github.workspace }}/artifacts"
+        # build-bridge.ps1 downloads ASM 9.7.1 from Maven Central,
+        # compiles with ASM on classpath, and embeds ASM in the fat JAR
 
-      - name: Verify JAR
+      - name: Verify JAR contains ASM
         working-directory: artifacts
         run: |
-          jar tf jmine-ktx-bridge.jar
+          jar tf jmine-ktx-bridge.jar | grep "org/objectweb/asm" | head -5
+          jar tf jmine-ktx-bridge.jar | grep "com/jmine" | head -5
           ls -la jmine-ktx-bridge.jar
 
       - name: Upload KTX bridge
@@ -282,7 +285,8 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "- **mimalloc**: Built for Windows, Linux, macOS" >> $GITHUB_STEP_SUMMARY
           echo "- **KTX (libktx + JNI)**: Built for Windows, Linux, macOS" >> $GITHUB_STEP_SUMMARY
-          echo "- **Java KTX Bridge**: Compiled and packaged as JAR" >> $GITHUB_STEP_SUMMARY
+          echo "- **Java KTX Bridge**: Compiled with ASM 9.7.1 embedded (fat JAR)" >> $GITHUB_STEP_SUMMARY
+          echo "- **ASM Bytecode Transformer**: Resource.open() interception enabled" >> $GITHUB_STEP_SUMMARY
           echo "- **JMine JRE**: Assembled for Windows, Linux, macOS" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "All components built successfully across all 3 platforms." >> $GITHUB_STEP_SUMMARY
