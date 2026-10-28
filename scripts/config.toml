@@ -1,0 +1,71 @@
+# JMine Build Configuration
+# Used by PowerShell build scripts and GitHub Actions workflows
+#
+# PowerShell scripts:
+#   scripts/mimalloc/build.ps1       — mimalloc native library
+#   scripts/ktx/build.ps1            — KTX library with JNI
+#   scripts/graal/build-bridge.ps1   — Java KTX Bridge JAR
+#   scripts/graal/build-jre.ps1      — GraalVM jlink JRE assembly
+#   scripts/graal/package.ps1        — Archive + checksum
+
+[versions]
+mimalloc = "v1.8.9"
+ktx = "v4.3.2"
+java = "25"
+jmine = "0.1.0"
+
+[build]
+# CMake build type (Release, RelWithDebInfo, Debug)
+cmake_build_type = "Release"
+
+# mimalloc options
+mimalloc_override = true        # MI_OVERRIDE=ON - replace system malloc
+mimalloc_shared = true          # Build shared library (DLL/SO/DYLIB)
+mimalloc_static = true          # Build static library
+mimalloc_tests = false          # Skip building tests
+mimalloc_show_errors = true     # Show error/warning messages
+mimalloc_stats = true           # Enable allocation statistics
+
+# KTX options
+ktx_jni = true                  # Build JNI bindings for Java
+ktx_tests = false               # Skip building tests
+ktx_tools = false               # Skip building CLI tools
+ktx_doc = false                 # Skip building documentation
+ktx_shared = true               # Build shared libraries
+
+# Java KTX bridge options
+java_release = 25               # --release flag for javac
+
+[jre]
+# jlink options for creating the custom JRE
+strip_debug = true              # Remove debug symbols
+compress = 2                    # Zip compression level (0-2)
+modules = "ALL-MODULE-PATH"     # Java modules to include
+
+[platform]
+# Default architecture (auto-detected if not set)
+# arch = "x64"
+
+# Platform-specific CMake generators (auto-detected if not set)
+# windows_generator = "Ninja"
+# linux_generator = "Unix Makefiles"
+# macos_generator = "Unix Makefiles"
+
+[paths]
+# Relative to project root (where this config.toml lives)
+mimalloc_source = "../mimalloc"
+ktx_source = "../ktx-software"
+bridge_source = "../jmine-ktx-bridge"
+output_dir = "output"
+
+# GraalVM JDK download URLs (for CI/CD assembly)
+[graalvm.download]
+windows = "https://github.com/graalvm/graalvm-ce-builds/releases/download/jdk-{version}/graalvm-community-jdk_{version}_windows-x64_bin.zip"
+linux = "https://github.com/graalvm/graalvm-ce-builds/releases/download/jdk-{version}/graalvm-community-jdk_{version}_linux-x64_bin.tar.gz"
+macos = "https://github.com/graalvm/graalvm-ce-builds/releases/download/jdk-{version}/graalvm-community-jdk_{version}_macos-x64_bin.tar.gz"
+
+[release]
+# GitHub Release settings
+draft = false
+prerelease = false
+generate_checksums = true       # Generate SHA256 checksums

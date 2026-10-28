@@ -1,0 +1,33 @@
+# Build output
+output/
+
+# Local build directories in dependencies
+mimalloc/build_local/
+ktx-software/build_local/
+
+# KTX bridge build artifacts
+jmine-ktx-bridge/build/
+jmine-ktx-bridge/*.jar
+
+# IDE
+.idea/
+*.iml
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+
+# Logs
+*.log

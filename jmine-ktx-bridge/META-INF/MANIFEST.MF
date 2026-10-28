@@ -1,0 +1,9 @@
+Manifest-Version: 1.0
+Premain-Class: com.jmine.texture.TextureAgent
+Can-Retransform-Classes: true
+Can-Set-Native-Method-Prefix: true
+Agent-Class: com.jmine.texture.TextureAgent
+Built-By: JMine
+Built-Date: 2026-10-28
+Specification-Title: JMine KTX Bridge
+Specification-Version: 1.0
